@@ -205,112 +205,131 @@ class _AddTShirtDialogState extends State<AddTShirtDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Add T-Shirt'),
-      content: Form(
-        key: _formKey,
-        child: Column(
-          children: <Widget>[
-            InkWell(
-              onTap: _pickAndUploadImage,
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(5),
-                ),
-                child: Center(
-                  child: _imageFile == null
-                      ? const Icon(Icons.upload_file)
-                      : SizedBox(
-                          height: 200,
-                          width: 100,
-                          child: Image.memory(
-                            _imageFile!,
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                          ),
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.6,
+      width: MediaQuery.of(context).size.width * 0.5,
+      child: Dialog(
+        child: Container(
+          padding: EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              const Text('Add T-Shirt',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+              Form(
+                key: _formKey,
+                child: Column(
+                  children: <Widget>[
+                    InkWell(
+                      onTap: _pickAndUploadImage,
+                      child: Container(
+                        height: 200,
+                        width: 100,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          borderRadius: BorderRadius.circular(5),
                         ),
+                        child: Center(
+                          child: _imageFile == null
+                              ? const Icon(Icons.upload_file)
+                              : SizedBox(
+                                  height: 200,
+                                  width: 100,
+                                  child: Image.memory(
+                                    _imageFile!,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: double.infinity,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
+                    TextFormField(
+                      controller: _titleController,
+                      decoration: const InputDecoration(labelText: 'Title'),
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a title';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _discountController,
+                      decoration: const InputDecoration(labelText: 'Discount'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a discount';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _orgPriceController,
+                      decoration:
+                          const InputDecoration(labelText: 'Original Price'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter an original price';
+                        }
+                        return null;
+                      },
+                    ),
+                    TextFormField(
+                      controller: _priceController,
+                      decoration: const InputDecoration(labelText: 'Price'),
+                      keyboardType: TextInputType.number,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Please enter a price';
+                        }
+                        return null;
+                      },
+                    ),
+                  ],
                 ),
               ),
-            ),
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(labelText: 'Title'),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a title';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _discountController,
-              decoration: const InputDecoration(labelText: 'Discount'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a discount';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _orgPriceController,
-              decoration: const InputDecoration(labelText: 'Original Price'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter an original price';
-                }
-                return null;
-              },
-            ),
-            TextFormField(
-              controller: _priceController,
-              decoration: const InputDecoration(labelText: 'Price'),
-              keyboardType: TextInputType.number,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a price';
-                }
-                return null;
-              },
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: <Widget>[
+                  TextButton(
+                    child: const Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('Save'),
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        FirebaseFirestore.instance
+                            .collection('category')
+                            .doc(widget.docID)
+                            .collection('tshirts')
+                            .add({
+                          'discount': int.parse(_discountController.text),
+                          'image': _imageController.text,
+                          'org_price': int.parse(_orgPriceController.text),
+                          'price': int.parse(_priceController.text),
+                          'ratings': 5,
+                          'reviews':
+                              [], // You may need to parse this depending on the data structure
+                          'status': true,
+                          'title': _titleController.text,
+                        });
+                        Navigator.of(context).pop();
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-      actions: <Widget>[
-        TextButton(
-          child: const Text('Cancel'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-        TextButton(
-          child: const Text('Save'),
-          onPressed: () {
-            if (_formKey.currentState!.validate()) {
-              FirebaseFirestore.instance
-                  .collection('category')
-                  .doc(widget.docID)
-                  .collection('tshirts')
-                  .add({
-                'discount': int.parse(_discountController.text),
-                'image': _imageController.text,
-                'org_price': int.parse(_orgPriceController.text),
-                'price': int.parse(_priceController.text),
-                'ratings': 5,
-                'reviews':
-                    [], // You may need to parse this depending on the data structure
-                'status': true,
-                'title': _titleController.text,
-              });
-              Navigator.of(context).pop();
-            }
-          },
-        ),
-      ],
     );
   }
 }
