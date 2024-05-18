@@ -1,0 +1,14 @@
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "originstyles",
+          "configurations": {
+            "web": "1:979537202195:web:28139c7b99d02c337383e6"
+          }
+        }
+      }
+    }
+  }
+}
